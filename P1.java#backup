@@ -1,0 +1,231 @@
+import greenfoot.*;  
+public class P1 extends Obstacle{
+    GreenfootImage redball;
+    boolean isOnGround;
+    int hSpeed = 0;
+    int hSpeedMax = 15;
+    int hFriction = 2;
+    int hAccel = 4;
+    int vSpeed = 0;
+    int vSpeedMax = 20;
+    boolean isonGround = false;
+    boolean isJumping = false;
+    int timer = 0;
+    int aTimer = 0;
+    int fTimer = 0;
+    int health = 0;
+    boolean k = false;
+    int kcooldown = 25;
+    public P1() {
+        redball = new GreenfootImage("red.png");
+        //turningR.mirrorHorizontally();
+    }
+
+    public void act() 
+    {
+        timer++;
+        groundCheck();
+        respawn();
+        controls();
+        friction();
+        maxspeed();
+        setLocation(getX()+hSpeed, getY()+vSpeed);
+        collisions();
+        kcooldown++;
+    }
+
+    public void groundCheck(){
+        int width = getImage().getWidth();
+        int height = getImage().getHeight();
+        Actor BL = getOneObjectAtOffset(-width/4,height/2+1, Obstacle.class);
+        Actor BR = getOneObjectAtOffset(width/4,height/2+1, Obstacle.class);
+        if(BL == null && BR == null){
+            isonGround = false;
+            if (timer % 2 == 0){
+                vSpeed++;
+            }
+        }
+        else{  
+            isonGround = true;
+            k = false;
+        }
+    }
+
+    public void respawn() {
+        if (getY()>1200){
+            setLocation(World1.respawnPoint.getX(),World1.respawnPoint.getY());
+            World1.mylives.decP1Lives();
+            World1.lifecount1.updateScore();
+            
+        }
+        
+
+    }
+
+    public void controls() { 
+        if((Greenfoot.isKeyDown("d"))&&(!Greenfoot.isKeyDown("s"))&&(!Greenfoot.isKeyDown("a"))) {
+
+            if (hSpeed == 0){
+                hSpeed = 2;
+            }
+            if (timer % hAccel == 0){
+                hSpeed++;
+            }
+        }
+        if ((Greenfoot.isKeyDown("k")) && ((Greenfoot.isKeyDown("w")))) {
+            if (kcooldown  >= 50){
+                if (k == false) {
+                    kcooldown = 0;
+                    vSpeed = -25;
+                    k = true;
+                }
+            }
+        }
+        if ((Greenfoot.isKeyDown("k")) && ((Greenfoot.isKeyDown("a")))) {
+            if (kcooldown  >= 50){
+                if (k == false) {
+                    kcooldown = 0;
+                    hSpeed = -25;
+                    k = true;
+                }
+            }
+        }
+        if ((Greenfoot.isKeyDown("k")) && ((Greenfoot.isKeyDown("s")))) {
+                      Actor P2 = getWorld().getObjects(P2.class).get(0);
+            if (timer % 250 == 0) { 
+                if ((getY() > getWorld().getObjects(P2.class).get(0).getY() && (getX() > getWorld().getObjects(P2.class).get(0).getX()))) { 
+                    vSpeed = -15;
+                    hSpeed = -15;
+                }
+                if ((getY() <getWorld().getObjects(P2.class).get(0).getY() && (getX() > getWorld().getObjects(P2.class).get(0).getX()))) { 
+                    vSpeed = 15;
+                    hSpeed = -15;
+                }
+                if ((getY() >getWorld().getObjects(P2.class).get(0).getY() && (getX() < getWorld().getObjects(P2.class).get(0).getX()))) { 
+                    vSpeed = -15;
+                    hSpeed = 15;
+                }
+                if ((getY() <getWorld().getObjects(P2.class).get(0).getY() && (getX() < getWorld().getObjects(P2.class).get(0).getX()))) { 
+                    vSpeed = 15;
+                    hSpeed = 15;
+                }
+                k = true;
+            }
+        }
+        if ((Greenfoot.isKeyDown("k")) && ((Greenfoot.isKeyDown("d")))) {
+            if (kcooldown  >= 50) {
+                if (k == false) {
+                    kcooldown=0;
+                    hSpeed = 25;
+                    k = true;
+                }
+            }
+        }
+        
+        
+        if((Greenfoot.isKeyDown("a"))&&(!Greenfoot.isKeyDown("s"))&&(!Greenfoot.isKeyDown("d"))) {
+
+            if (hSpeed == 0){
+
+                hSpeed = -2;
+            }
+            if (timer % hAccel == 0){
+                hSpeed--;
+            }
+        }
+        if(Greenfoot.isKeyDown("w")&&(isonGround == true)) {
+            vSpeed = -15;
+            isonGround = false;
+            isJumping = true;
+        }
+        if((!Greenfoot.isKeyDown("w"))&&(isJumping == true)) {
+            vSpeed = vSpeed/2;  
+            isJumping = false;
+        }
+        if(isonGround == true){
+
+            isJumping = false;
+        }        
+
+        if((Greenfoot.isKeyDown("s"))&&(isonGround == true)) {
+
+            setLocation(getX(), getY()+9);
+
+        }
+        if ((Greenfoot.isKeyDown("s"))&&((Greenfoot.isKeyDown("a"))||(Greenfoot.isKeyDown("d"))||(Greenfoot.isKeyDown("w")))){
+            if(isonGround == true){
+                vSpeed = 0;
+            }
+            hSpeed = 0;
+
+        }
+    }
+
+    public void friction() {
+        if (((!Greenfoot.isKeyDown("d"))&&(!Greenfoot.isKeyDown("a")))||((Greenfoot.isKeyDown("d"))&&(Greenfoot.isKeyDown("a")))){
+            if(hSpeed > 0) {
+                if(timer % hFriction == 0){
+                    hSpeed--;
+                }
+            }
+            if(hSpeed < 0) {
+                if(timer % hFriction == 0){
+                    hSpeed++;
+                }
+            }
+        }
+    }
+
+    public void maxspeed() {
+        if (hSpeed > hSpeedMax){
+            hSpeed = hSpeedMax;
+        }
+        if (hSpeed < -hSpeedMax){
+            hSpeed = -hSpeedMax;
+        }
+        if (vSpeed > vSpeedMax){
+            vSpeed = vSpeedMax;
+        }
+        if (vSpeed < -vSpeedMax){
+            vSpeed = -vSpeedMax;
+        }
+    }
+
+    public void collisions(){
+        int width = getImage().getWidth();
+        int height = getImage().getHeight();
+        Actor B = getOneObjectAtOffset(0,height/2, Obstacle.class);
+        Actor R = getOneObjectAtOffset(width/2,0, Obstacle.class);
+        Actor L = getOneObjectAtOffset(-width/2,0, Obstacle.class);
+        Actor T = getOneObjectAtOffset(0,-height/2, Obstacle.class);
+
+        if(B != null){
+            vSpeed*= -9/10;
+            int obsY = B.getY();
+            int obsH = B.getImage().getHeight();
+            setLocation(getX(),obsY-obsH/2-height/2);
+        }
+
+        if(T != null){
+            vSpeed*= -9/10;
+            int obsY = T.getY();
+            int obsH = T.getImage().getHeight();
+            setLocation(getX(),obsY+obsH/2+height/2);
+        }
+
+        if(L != null){
+            hSpeed*= -9/10;
+            int obsX = L.getX();
+            int obsW = L.getImage().getWidth();
+            setLocation(obsX+obsW/2+width/2,getY());
+        }
+        if(R != null){
+            hSpeed*= -9/10;
+            int obsX = R.getX();
+            int obsW = R.getImage().getWidth();
+            setLocation(obsX-obsW/2-width/2,getY());
+        }
+
+    }
+}
+

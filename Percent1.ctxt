@@ -1,0 +1,15 @@
+#BlueJ class context
+comment0.target=Percent1
+comment1.params=
+comment1.target=void\ act()
+comment2.params=
+comment2.target=Percent1()
+comment3.params=
+comment3.target=void\ updatePercent()
+comment4.params=n
+comment4.target=void\ addPercent(int)
+comment5.params=
+comment5.target=int\ getPercent()
+comment6.params=
+comment6.target=void\ resetpercent()
+numComments=7
